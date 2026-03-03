@@ -251,7 +251,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/charlieqel/booklore:${{ env.image_tag }}
+            ghcr.io/charlieqle/booklore:${{ env.image_tag }}
           build-args: |
             APP_VERSION=${{ env.image_tag }}
             APP_REVISION=${{ github.sha }}
