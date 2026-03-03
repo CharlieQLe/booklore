@@ -2,6 +2,7 @@ import {Book, ReadStatus} from '../../book/model/book.model';
 
 export interface SeriesSummary {
   seriesName: string;
+  comicVolumeNumber: number | null;
   books: Book[];
   authors: string[];
   categories: string[];

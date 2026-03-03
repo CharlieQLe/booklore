@@ -297,9 +297,15 @@ public class KoboEntitlementService {
 
         KoboBookMetadata.Series series = null;
         if (metadata.getSeriesName() != null && !metadata.getSeriesName().isBlank()) {
+            String seriesName = metadata.getSeriesName();
+            ComicMetadataEntity comicMetadata = metadata.getComicMetadata();
+            if (comicMetadata != null && comicMetadata.getVolumeNumber() != null) {
+                seriesName = String.format("%s (%d)", seriesName, comicMetadata.getVolumeNumber());
+            }
+
             series = KoboBookMetadata.Series.builder()
-                    .id("series_" + metadata.getSeriesName().hashCode())
-                    .name(metadata.getSeriesName())
+                    .id("series_" + seriesName.hashCode())
+                    .name(seriesName)
                     .number(metadata.getSeriesNumber() != null 
                         ? BigDecimal.valueOf(metadata.getSeriesNumber()).stripTrailingZeros().toPlainString() 
                         : "1")

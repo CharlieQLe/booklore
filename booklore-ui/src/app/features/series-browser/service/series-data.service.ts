@@ -20,12 +20,26 @@ export class SeriesDataService {
 
   private buildSeriesSummaries(books: Book[]): SeriesSummary[] {
     const seriesMap = new Map<string, Book[]>();
+    const comicVolumeMap = new Map<string, Map<number, Book[]>>();
 
     for (const book of books) {
       const seriesName = book.metadata?.seriesName;
       if (!seriesName) continue;
-
       const key = seriesName.trim().toLowerCase();
+
+      const comicVolumeNumber = book.metadata?.comicMetadata?.volumeNumber;
+      if (comicVolumeNumber) {
+        if (!comicVolumeMap.has(key)) {
+          comicVolumeMap.set(key, new Map());
+        }
+        const map = comicVolumeMap.get(key)!;
+        if (!map.has(comicVolumeNumber)) {
+          map.set(comicVolumeNumber, []);
+        }
+        map.get(comicVolumeNumber)!.push(book);
+        continue;
+      }
+
       if (!seriesMap.has(key)) {
         seriesMap.set(key, []);
       }
@@ -34,7 +48,19 @@ export class SeriesDataService {
 
     const summaries: SeriesSummary[] = [];
 
+    const foundBooks: Book[][] = [];
+
+    for (const comicVolumeMaps of comicVolumeMap.values()) {
+      for (const comicBooks of comicVolumeMaps.values()) {
+        foundBooks.push(comicBooks);
+      }
+    }
+
     for (const seriesBooks of seriesMap.values()) {
+      foundBooks.push(seriesBooks);
+    }
+
+    for (const seriesBooks of foundBooks) {
       const sorted = seriesBooks.sort((a, b) => {
         const aNum = a.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
         const bNum = b.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
@@ -42,6 +68,7 @@ export class SeriesDataService {
       });
 
       const displayName = sorted[0].metadata?.seriesName?.trim() || '';
+      const comicVolumeNumber = sorted[0].metadata?.comicMetadata?.volumeNumber || null;
       const authorSet = new Set<string>();
       const categorySet = new Set<string>();
 
@@ -67,6 +94,7 @@ export class SeriesDataService {
 
       summaries.push({
         seriesName: displayName,
+        comicVolumeNumber: comicVolumeNumber,
         books: sorted,
         authors: Array.from(authorSet),
         categories: Array.from(categorySet),

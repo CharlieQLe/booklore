@@ -1082,9 +1082,11 @@ export class CbxReaderComponent implements OnInit, OnDestroy {
 
   private sortBooksBySeriesNumber(books: Book[]): Book[] {
     return books.sort((bookA, bookB) => {
+      const aVol = bookA.metadata?.comicMetadata?.volumeNumber ?? Number.MAX_SAFE_INTEGER;
+      const bVol = bookB.metadata?.comicMetadata?.volumeNumber ?? Number.MAX_SAFE_INTEGER;
       const seriesNumberA = bookA.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
       const seriesNumberB = bookB.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
-      return seriesNumberA - seriesNumberB;
+      return aVol - bVol || seriesNumberA - seriesNumberB;
     });
   }
 

@@ -234,13 +234,22 @@ export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
         data = metadata.authors ?? [];
         break;
 
-      case 'seriesName':
+      case 'seriesName': {
+        if (metadata.comicMetadata && metadata.comicMetadata.volumeNumber !== undefined) {
+          return [
+            {
+              url: this.urlHelper.filterBooksByComicVolume(metadata.seriesName ?? '', metadata.comicMetadata.volumeNumber ?? null),
+              anchor: `${metadata.seriesName} (${metadata.comicMetadata.volumeNumber})`
+            }
+          ]
+        }
         return [
           {
             url: this.urlHelper.filterBooksBy('series', metadata.seriesName ?? ''),
             anchor: metadata.seriesName
           }
         ]
+      }
       case 'isbn':
         return [
           {
@@ -272,8 +281,12 @@ export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
       case 'publisher':
         return metadata.publisher ?? '';
 
-      case 'seriesName':
+      case 'seriesName': {
+        if (metadata.comicMetadata && metadata.comicMetadata.volumeNumber) {
+          return `${metadata.seriesName} (${metadata.comicMetadata.volumeNumber})`
+        }
         return metadata.seriesName ?? '';
+      }
 
       case 'seriesNumber':
         return metadata.seriesNumber ?? '';

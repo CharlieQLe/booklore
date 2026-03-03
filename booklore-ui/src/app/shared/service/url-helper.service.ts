@@ -134,4 +134,10 @@ export class UrlHelperService {
       }
     });
   }
+
+  filterBooksByComicVolume(series: string, volume: number | null) {
+    const path = ['/series', encodeURIComponent(series)];
+    if (volume !== null) path.push("volume", encodeURIComponent(volume ?? ''));
+    return this.router.createUrlTree(path);
+  }
 }
