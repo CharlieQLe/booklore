@@ -51,7 +51,7 @@ export class SeriesDataService {
     const foundBooks: Book[][] = [];
 
     for (const comicVolumeMaps of comicVolumeMap.values()) {
-      for (const comicBooks of comicVolumeMaps.values()) {
+      for (const [, comicBooks] of Array.from(comicVolumeMaps.entries()).sort(([a], [b]) => a - b)) {
         foundBooks.push(comicBooks);
       }
     }

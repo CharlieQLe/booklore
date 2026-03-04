@@ -123,8 +123,10 @@ export class SeriesCollapseFilter implements BookFilter, OnDestroy {
           }
         }
 
+        
+
         for (const [seriesName, volumeMap] of comicMap.entries()) {
-          for (const [volume, group] of volumeMap.entries()) {
+          for (const [volume, group] of Array.from(volumeMap.entries()).sort(([a], [b]) => a - b)) {
             const sortedGroup = group.slice().sort((a, b) => {
               const aNum = a.metadata?.seriesNumber ?? Number.MAX_VALUE;
               const bNum = b.metadata?.seriesNumber ?? Number.MAX_VALUE;
