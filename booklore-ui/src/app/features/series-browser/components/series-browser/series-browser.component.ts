@@ -166,7 +166,11 @@ export class SeriesBrowserComponent implements OnInit {
   }
 
   navigateToSeries(series: SeriesSummary): void {
-    this.router.navigate(['/series', series.seriesName]);
+    const path = ['/series', series.seriesName];
+    if (series.comicVolumeNumber !== null) {
+      path.push('volume', series.comicVolumeNumber.toString());
+    }
+    this.router.navigate(path);
   }
 
   private applyStatusFilter(series: SeriesSummary[], filterValue: string): SeriesSummary[] {
