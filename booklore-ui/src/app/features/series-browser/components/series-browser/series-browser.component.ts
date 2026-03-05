@@ -166,7 +166,7 @@ export class SeriesBrowserComponent implements OnInit {
   }
 
   navigateToSeries(series: SeriesSummary): void {
-    const path = ['/series', series.seriesName];
+    const path = ['/series', encodeURIComponent(series.seriesName)];
     if (series.comicVolumeNumber !== null) {
       path.push('volume', series.comicVolumeNumber.toString());
     }
