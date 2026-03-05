@@ -33,7 +33,12 @@
                   }
 
                   <div class="hero-info">
-                    <h2 class="series-title">{{ seriesTitle$ | async }}</h2>
+                    <h2 class="series-title">
+                      {{ seriesTitle$ | async }}
+                      @if (seriesVolumeParam$ | async; as volume) {
+                        ({{ volume }})
+                      }
+                    </h2>
 
                     @if (allAuthors$ | async; as authors) {
                       <p class="series-authors">

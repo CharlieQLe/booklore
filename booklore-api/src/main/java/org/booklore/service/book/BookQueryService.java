@@ -197,10 +197,7 @@ public class BookQueryService {
                 cm.setTeamsLocked(null);
                 cm.setLocationsLocked(null);
 
-                // Strip non-filter detail fields
-                cm.setIssueNumber(null);
-                cm.setVolumeName(null);
-                cm.setVolumeNumber(null);
+                // Strip non-filter detail fields except for volume metadata
                 cm.setStoryArc(null);
                 cm.setStoryArcNumber(null);
                 cm.setAlternateSeries(null);

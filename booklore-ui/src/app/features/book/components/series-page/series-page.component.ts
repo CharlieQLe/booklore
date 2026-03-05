@@ -144,6 +144,11 @@ export class SeriesPageComponent implements OnDestroy, AfterViewChecked {
     map((name) => decodeURIComponent(name))
   );
 
+  seriesVolumeParam$: Observable<number | null> = this.route.paramMap.pipe(
+    map((params) => params.get("seriesVolume") || ""),
+    map((volume) => Number.parseInt(decodeURIComponent(volume)) || null)
+  );
+
   booksInSeries$: Observable<Book[]> = this.bookService.bookState$.pipe(
     filter((state) => state.loaded && !!state.books),
     map((state) => state.books || [])
@@ -151,17 +156,20 @@ export class SeriesPageComponent implements OnDestroy, AfterViewChecked {
 
   filteredBooks$: Observable<Book[]> = combineLatest([
     this.seriesParam$.pipe(map((n) => n.trim().toLowerCase())),
+    this.seriesVolumeParam$.pipe(map(n => n)),
     this.booksInSeries$,
   ]).pipe(
-    map(([seriesName, books]) => {
-      const inSeries = books.filter(
-        (b) => b.metadata?.seriesName?.trim().toLowerCase() === seriesName
-      );
-      return inSeries.sort((a, b) => {
-        const aNum = a.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
-        const bNum = b.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
-        return aNum - bNum;
-      });
+    map(([seriesName, seriesVolume, books]) => {
+      let inSeries = books.filter((b) => b.metadata?.seriesName?.trim().toLowerCase() === seriesName);
+      if (seriesVolume !== null) inSeries = inSeries.filter(b => b.metadata?.comicMetadata?.volumeNumber === seriesVolume);
+      return inSeries
+        .sort((a, b) => {
+          const aVol = a.metadata?.comicMetadata?.volumeNumber ?? Number.MAX_SAFE_INTEGER;
+          const bVol = b.metadata?.comicMetadata?.volumeNumber ?? Number.MAX_SAFE_INTEGER;
+          const aNum = a.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
+          const bNum = b.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
+          return aVol - bVol || aNum - bNum;
+        });
     }),
     tap(books => this.currentBooks = books)
   );

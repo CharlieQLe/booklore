@@ -150,7 +150,11 @@ export class BookCardComponent implements OnInit, OnChanges, OnDestroy {
 
     if (changes['seriesViewEnabled'] || changes['isSeriesCollapsed']) {
       this._isSeriesViewActive = this.seriesViewEnabled && !!this.book.seriesCount && this.book.seriesCount >= 1;
-      this._displayTitle = (this.isSeriesCollapsed && this.book.metadata?.seriesName) ? this.book.metadata?.seriesName : this.book.metadata?.title;
+      if (this.isSeriesCollapsed && this.book.metadata?.seriesName) {
+        if (this.book.metadata?.comicMetadata && this.book.metadata?.comicMetadata.volumeNumber !== undefined) {
+          this._displayTitle = `${this.book.metadata?.seriesName} (${this.book.metadata?.comicMetadata.volumeNumber})`;
+        } else this._displayTitle = this.book.metadata?.seriesName;
+      } else this._displayTitle = this.book.metadata?.title;
       this._titleTooltip = this.t.translate('book.card.alt.titleTooltip', { title: this._displayTitle });
     }
   }
@@ -167,9 +171,11 @@ export class BookCardComponent implements OnInit, OnChanges, OnDestroy {
     this._hasProgress = this._progressPercentage !== null || this._koProgressPercentage !== null || this._koboProgressPercentage !== null;
 
     this._isSeriesViewActive = this.seriesViewEnabled && !!this.book.seriesCount && this.book.seriesCount >= 1;
-    this._displayTitle = (this.isSeriesCollapsed && this.book.metadata?.seriesName)
-      ? this.book.metadata?.seriesName
-      : this.book.metadata?.title;
+    if (this.isSeriesCollapsed && this.book.metadata?.seriesName) {
+        if (this.book.metadata?.comicMetadata && this.book.metadata?.comicMetadata.volumeNumber !== undefined) {
+          this._displayTitle = `${this.book.metadata?.seriesName} (${this.book.metadata?.comicMetadata.volumeNumber})`;
+        } else this._displayTitle = this.book.metadata?.seriesName;
+      } else this._displayTitle = this.book.metadata?.title;
     this._isAudiobook = this.book.primaryFile?.bookType === 'AUDIOBOOK' && !this.forceEbookMode;
     this._coverImageUrl = this._isAudiobook
       ? this.urlHelper.getAudiobookThumbnailUrl(this.book.id, this.book.metadata?.audiobookCoverUpdatedOn)
@@ -681,8 +687,11 @@ export class BookCardComponent implements OnInit, OnChanges, OnDestroy {
   openSeriesInfo(): void {
     const seriesName = this.book?.metadata?.seriesName;
     if (this.isSeriesCollapsed && seriesName) {
-      const encodedSeriesName = encodeURIComponent(seriesName);
-      this.router.navigate(['/series', encodedSeriesName]);
+      const path = ['/series', encodeURIComponent(seriesName)];
+      if (this.book.metadata?.comicMetadata && this.book.metadata?.comicMetadata.volumeNumber !== undefined) {
+        path.push('volume', this.book.metadata?.comicMetadata.volumeNumber.toString());
+      }
+      this.router.navigate(path);
     } else {
       this.openBookInfo(this.book);
     }

@@ -97,17 +97,47 @@ export class SeriesCollapseFilter implements BookFilter, OnDestroy {
         const books = [...bookState.books];
 
         const seriesMap = new Map<string, Book[]>();
+        const comicMap = new Map<string, Map<number, Book[]>>();
         const collapsedBooks: Book[] = [];
 
         for (const book of books) {
           const seriesName = book.metadata?.seriesName?.trim();
-          if (seriesName) {
-            if (!seriesMap.has(seriesName)) {
-              seriesMap.set(seriesName, []);
+          if (seriesName && book.metadata?.comicMetadata && book.metadata?.comicMetadata.volumeNumber) {
+            if (!comicMap.has(seriesName)) {
+              comicMap.set(seriesName, new Map());
             }
-            seriesMap.get(seriesName)!.push(book);
+            const volumeMap = comicMap.get(seriesName)!;
+            if (!volumeMap.has(book.metadata?.comicMetadata.volumeNumber)) {
+              volumeMap.set(book.metadata?.comicMetadata.volumeNumber, []);
+            }
+            volumeMap.get(book.metadata?.comicMetadata.volumeNumber)!.push(book);
           } else {
-            collapsedBooks.push(book);
+            if (seriesName) {
+              if (!seriesMap.has(seriesName)) {
+                seriesMap.set(seriesName, []);
+              }
+              seriesMap.get(seriesName)!.push(book);
+            } else {
+              collapsedBooks.push(book);
+            }
+          }
+        }
+
+        
+
+        for (const [seriesName, volumeMap] of comicMap.entries()) {
+          for (const [volume, group] of Array.from(volumeMap.entries()).sort(([a], [b]) => a - b)) {
+            const sortedGroup = group.slice().sort((a, b) => {
+              const aNum = a.metadata?.seriesNumber ?? Number.MAX_VALUE;
+              const bNum = b.metadata?.seriesNumber ?? Number.MAX_VALUE;
+              return aNum - bNum;
+            });
+            const firstBook = sortedGroup[0];
+            collapsedBooks.push({
+              ...firstBook,
+              seriesBooks: group,
+              seriesCount: group.length
+            });
           }
         }
 

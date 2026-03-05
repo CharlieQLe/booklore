@@ -818,9 +818,13 @@ export class MetadataViewerComponent implements OnInit, OnChanges, AfterViewChec
     this.handleMetadataClick('tag', tag);
   }
 
-  goToSeries(seriesName: string): void {
-    const encodedSeriesName = encodeURIComponent(seriesName);
-    this.router.navigate(['/series', encodedSeriesName]);
+  goToSeries(book: Book | null): void {
+    if (book === null) return;
+    const route = ['/series', encodeURIComponent(book.metadata?.seriesName ?? "")];
+    if (book.metadata?.comicMetadata && book.metadata?.comicMetadata.volumeNumber !== undefined) {
+      route.push("volume", book.metadata.comicMetadata.volumeNumber.toString());
+    }
+    this.router.navigate(route);
   }
 
   goToPublisher(publisher: string): void {

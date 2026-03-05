@@ -166,7 +166,11 @@ export class BookService {
         }
 
         const seriesName = currentBook.metadata.seriesName.toLowerCase();
-        return allBooks.filter(b => b.metadata?.seriesName?.toLowerCase() === seriesName);
+        let books = allBooks.filter(b => b.metadata?.seriesName?.toLowerCase() === seriesName);
+        if (currentBook.metadata.comicMetadata && currentBook.metadata.comicMetadata.volumeNumber !== undefined) {
+          books = books.filter(b => b.metadata?.comicMetadata?.volumeNumber === currentBook.metadata?.comicMetadata?.volumeNumber);
+        }
+        return books;
       })
     );
   }

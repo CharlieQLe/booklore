@@ -14,6 +14,9 @@
   <div class="card-body">
     <h4 class="series-name" [pTooltip]="series.seriesName" tooltipPosition="bottom">
       {{ series.seriesName }}
+      @if (series.comicVolumeNumber !== null) {
+        ({{ series.comicVolumeNumber }})
+      }
     </h4>
 
     <p class="series-authors" [pTooltip]="series.authors.join(', ')" tooltipPosition="bottom">
