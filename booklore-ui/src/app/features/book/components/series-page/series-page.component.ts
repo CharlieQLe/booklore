@@ -183,14 +183,6 @@ export class SeriesPageComponent implements OnDestroy, AfterViewChecked {
     this.filteredBooks$,
   ]).pipe(map(([param, books]) => books[0]?.metadata?.seriesName || param));
 
-  comicVolumeNumber$: Observable<string> = combineLatest([
-    this.seriesVolumeParam$,
-    this.filteredBooks$,
-  ]).pipe(map(([param, books]) => {
-    if (books[0]?.metadata?.comicMetadata) return `Volume ${books[0]?.metadata?.comicMetadata?.volumeNumber}`;
-    return param?.toString() || '';
-  }));
-
   yearsRange$: Observable<string | null> = this.filteredBooks$.pipe(
     map((books) => {
       const years = books
